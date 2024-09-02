@@ -9,7 +9,7 @@ export default function Home() {
         Kids Learning App!
       </h1>
       <p>select any game to start! &rarr;</p>
-      <div className=" flex gap-8">
+      <div className="flex gap-8 md:flex-row flex-col">
         <GameCard />
         <GameCardMaths />
         <GameCardQuiz />
