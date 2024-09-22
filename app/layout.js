@@ -1,8 +1,8 @@
+// app/layout.js
 import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
 import Navbar from "./_components/Navbar";
 
-// Correctly configure the Poppins font with weights as numbers
 const poppins = Poppins({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
   subsets: ["latin"],

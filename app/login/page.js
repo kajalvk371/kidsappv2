@@ -1,5 +1,10 @@
 import React from "react";
+import Auth from "../_components/Auth";
 
 export default function page() {
-  return <div>Login Page</div>;
+  return (
+    <div>
+      <Auth />
+    </div>
+  );
 }
