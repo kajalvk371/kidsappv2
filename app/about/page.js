@@ -13,19 +13,19 @@ export default function page() {
         </h2>
         <p className="text-base sm:text-lg mb-4">
           We believe learning should be fun and exciting for kids, so we created
-          this app to make education an adventure! Whether you're practicing
-          your ABCs, brushing up on your math skills, or testing your general
-          knowledge, there's something here for everyone!
+          this app to make education an adventure! Whether you&apos;re
+          practicing your ABCs, brushing up on your math skills, or testing your
+          general knowledge, there&apos;s something here for everyone!
         </p>
 
         <h3 className="text-xl sm:text-2xl font-semibold text-green-600 mb-4">
           ABC Game 📚
         </h3>
         <p className="text-base sm:text-lg mb-4">
-          In the <strong>ABC Game</strong>, you'll journey through the alphabet
-          and match each letter with a fun emoji! Think you can spot the right
-          one? Test your knowledge and see if you're a master of letters and
-          symbols. 🎨
+          In the <strong>ABC Game</strong>, you&apos;ll journey through the
+          alphabet and match each letter with a fun emoji! Think you can spot
+          the right one? Test your knowledge and see if you&apos;re a master of
+          letters and symbols. 🎨
         </p>
 
         <h3 className="text-xl sm:text-2xl font-semibold text-purple-600 mb-4">
@@ -34,8 +34,8 @@ export default function page() {
         <p className="text-base sm:text-lg mb-4">
           Love solving problems? The <strong>Maths Game</strong> is perfect for
           you! With random addition, subtraction, multiplication, and division
-          challenges, you'll become a math whiz in no time! Sharpen your skills
-          and have fun cracking those numbers! 💡
+          challenges, you&apos;ll become a math whiz in no time! Sharpen your
+          skills and have fun cracking those numbers! 💡
         </p>
 
         <h3 className="text-xl sm:text-2xl font-semibold text-red-600 mb-4">
@@ -43,9 +43,9 @@ export default function page() {
         </h3>
         <p className="text-base sm:text-lg mb-4">
           The <strong>Quiz Game</strong> is packed with exciting trivia
-          questions. From capital cities to animal facts, you'll learn something
-          new with each question! Are you ready to test your brain and score
-          some points? Let's find out! 🏆
+          questions. From capital cities to animal facts, you&apos;ll learn
+          something new with each question! Are you ready to test your brain and
+          score some points? Let&apos;s find out! 🏆
         </p>
 
         <h2 className="text-xl sm:text-2xl font-bold mt-6 text-pink-600">

@@ -93,7 +93,7 @@ export default function Auth() {
         <p className="text-center mt-4">
           {isLogin ? (
             <>
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <span
                 onClick={() => setIsLogin(false)}
                 className="text-blue-500 cursor-pointer"
