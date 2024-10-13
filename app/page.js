@@ -3,6 +3,7 @@ import GameCard from "./_components/GameCard";
 import GameCardMaths from "./_components/GameCardMaths";
 import GameCardQuiz from "./_components/GameCardQuiz";
 import ProtectedRoute from "./_components/ProtectedRoute";
+import GameCardCountryFlag from "./_components/GameCardCountryFlag";
 
 export default function Home() {
   return (
@@ -16,6 +17,7 @@ export default function Home() {
           <GameCard />
           <GameCardMaths />
           <GameCardQuiz />
+          <GameCardCountryFlag />
         </ProtectedRoute>
       </div>
     </div>

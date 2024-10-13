@@ -1,8 +1,10 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import Confetti from "react-confetti"; // Import a confetti library
 
 export default function QuizGame() {
-  const questions = [
+  const originalQuestions = [
     {
       question: "What is the capital of France?",
       options: ["Berlin", "Madrid", "Paris", "Rome"],
@@ -28,12 +30,70 @@ export default function QuizGame() {
       options: ["Earth", "Venus", "Mars", "Jupiter"],
       correctAnswer: "Mars",
     },
+    {
+      question: "What is the largest ocean on Earth?",
+      options: [
+        "Atlantic Ocean",
+        "Indian Ocean",
+        "Arctic Ocean",
+        "Pacific Ocean",
+      ],
+      correctAnswer: "Pacific Ocean",
+    },
+    {
+      question: "How many continents are there?",
+      options: ["5", "6", "7", "8"],
+      correctAnswer: "7",
+    },
+    {
+      question: "What is the hardest natural substance on Earth?",
+      options: ["Gold", "Iron", "Diamond", "Quartz"],
+      correctAnswer: "Diamond",
+    },
+    {
+      question: "What is the boiling point of water?",
+      options: ["100°C", "90°C", "80°C", "110°C"],
+      correctAnswer: "100°C",
+    },
+    {
+      question: "What gas do plants absorb from the atmosphere?",
+      options: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Hydrogen"],
+      correctAnswer: "Carbon Dioxide",
+    },
+    {
+      question: "Which is the smallest prime number?",
+      options: ["1", "2", "3", "5"],
+      correctAnswer: "2",
+    },
+    {
+      question: "What is the main ingredient in guacamole?",
+      options: ["Tomato", "Avocado", "Pepper", "Onion"],
+      correctAnswer: "Avocado",
+    },
+    {
+      question: "What is the capital of Japan?",
+      options: ["Beijing", "Seoul", "Tokyo", "Bangkok"],
+      correctAnswer: "Tokyo",
+    },
   ];
 
+  // Shuffle questions function
+  const shuffleArray = (array) => {
+    return array.sort(() => Math.random() - 0.5);
+  };
+
+  const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [message, setMessage] = useState("");
   const [score, setScore] = useState(0);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false); // State for confetti
+
+  // Shuffle questions on mount
+  useEffect(() => {
+    setQuestions(shuffleArray([...originalQuestions]));
+  }, []);
 
   const currentQuestion = questions[currentQuestionIndex];
 
@@ -61,7 +121,17 @@ export default function QuizGame() {
       setMessage(
         `Quiz Complete! You scored ${score} out of ${questions.length}!`
       );
+      setShowConfetti(true); // Show confetti on quiz completion
     }
+  };
+
+  const playAgain = () => {
+    setQuestions(shuffleArray([...originalQuestions])); // Shuffle questions again
+    setCurrentQuestionIndex(0);
+    setSelectedAnswer(null);
+    setMessage("");
+    setScore(0);
+    setShowConfetti(false); // Reset confetti state
   };
 
   useEffect(() => {
@@ -69,29 +139,41 @@ export default function QuizGame() {
     setSelectedAnswer(null);
   }, [currentQuestionIndex]);
 
+  // Toggle the how to play modal
+  const toggleHowToPlay = () => {
+    setShowHowToPlay(!showHowToPlay);
+  };
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-100">
+    <div className="max-h-screen flex flex-col items-center justify-center">
+      {showConfetti && <Confetti />}
       <h1 className="text-3xl md:text-4xl font-bold mb-6 text-blue-600 text-center">
         Kids Quiz Game
       </h1>
-      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-3xl flex flex-col items-center space-y-4">
+      <button
+        onClick={toggleHowToPlay}
+        className="mb-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg"
+      >
+        How to Play
+      </button>
+      <div className="bg-white rounded-lg border p-6 w-full max-w-3xl flex flex-col items-center space-y-4 shadow-lg">
         {/* Question */}
         <p className="text-lg md:text-2xl mb-4 text-center">
           <span className="font-bold">Question:</span>{" "}
-          {currentQuestion.question}
+          {currentQuestion?.question}
         </p>
 
         {/* Options */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-          {currentQuestion.options.map((option, index) => (
+          {currentQuestion?.options.map((option, index) => (
             <button
               key={index}
-              className={`py-2 px-4 rounded-lg transition duration-200 ease-in-out transform ${
+              className={`py-2 px-4 rounded-lg border border-gray-300 transition duration-200 ease-in-out transform bg-stone-100 text-stone-900 ${
                 selectedAnswer === option
                   ? option === currentQuestion.correctAnswer
                     ? "bg-green-500 text-white"
                     : "bg-red-500 text-white"
-                  : "bg-blue-500 hover:bg-blue-600 text-white"
+                  : "hover:bg-stone-400 text-stone-950"
               }`}
               onClick={() => checkAnswer(option)}
               disabled={selectedAnswer !== null} // Disable buttons after answering
@@ -115,7 +197,46 @@ export default function QuizGame() {
               : "Finish Quiz"}
           </button>
         )}
+
+        {/* Play Again Button */}
+        {showConfetti && (
+          <button
+            onClick={playAgain}
+            className="mt-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-6 rounded-lg"
+          >
+            Play Again
+          </button>
+        )}
       </div>
+      {/* How to Play Modal */}
+      {showHowToPlay && (
+        <motion.div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+          onClick={toggleHowToPlay}
+        >
+          <motion.div
+            className="bg-white p-8 rounded shadow-lg text-center"
+            onClick={(e) => e.stopPropagation()}
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0 }}
+          >
+            <h2 className="text-2xl font-bold mb-4 ">How to Play</h2>
+            <p className="mb-4 max-w-96">
+              Answer the quiz questions correctly to earn points. You have three
+              lives. Each incorrect answer will deduct one life. You can move to
+              the next question after answering. Scores will be displayed at the
+              end!
+            </p>
+            <button
+              onClick={toggleHowToPlay}
+              className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg"
+            >
+              Close
+            </button>
+          </motion.div>
+        </motion.div>
+      )}
     </div>
   );
 }

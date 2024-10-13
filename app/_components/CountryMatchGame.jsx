@@ -3,39 +3,26 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion"; // Import Framer Motion
 import Confetti from "react-confetti"; // Import Confetti
 
-export default function ABC() {
-  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-  const emojiDictionary = {
-    A: "🍎", // Apple
-    B: "🍌", // Banana
-    C: "🌽", // Corn
-    D: "🐶", // Dog
-    E: "🍆", // Eggplant
-    F: "🐸", // Frog
-    G: "🍇", // Grapes
-    H: "🏠", // House
-    I: "🍦", // Ice cream
-    J: "🤹", // Juggler
-    K: "🥝", // Kiwi
-    L: "🍋", // Lemon
-    M: "🌕", // Moon
-    N: "🥜", // Nut
-    O: "🍊", // Orange
-    P: "🍍", // Pineapple
-    Q: "👑", // Queen
-    R: "🤖", // Robot
-    S: "🐍", // Snake
-    T: "🌮", // Taco
-    U: "☂️", // Umbrella
-    V: "🌋", // Volcano
-    W: "🍉", // Watermelon
-    X: "❌", // Cross mark
-    Y: "🍋", // Lemon (Incorrect Emoji Example)
-    Z: "🦓", // Zebra
-  };
+// Flag and country dictionary
+const countryDictionary = {
+  "🇺🇸": "United States",
+  "🇨🇦": "Canada",
+  "🇬🇧": "United Kingdom",
+  "🇦🇺": "Australia",
+  "🇩🇪": "Germany",
+  "🇫🇷": "France",
+  "🇯🇵": "Japan",
+  "🇧🇷": "Brazil",
+  "🇮🇹": "Italy",
+  "🇮🇳": "India",
+  // Add more countries and their flags here
+};
 
-  const [currentLetter, setCurrentLetter] = useState("A");
-  const [currentEmoji, setCurrentEmoji] = useState("🍎");
+const countries = Object.values(countryDictionary);
+
+export default function CountryMatchGame() {
+  const [currentFlag, setCurrentFlag] = useState("🇺🇸");
+  const [currentCountry, setCurrentCountry] = useState("United States");
   const [message, setMessage] = useState("");
   const [lives, setLives] = useState(3);
   const [points, setPoints] = useState(0);
@@ -44,41 +31,45 @@ export default function ABC() {
   const [buttonDisabled, setButtonDisabled] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [confetti, setConfetti] = useState(false); // State for confetti
+  const [options, setOptions] = useState([]);
 
-  const getRandomEmoji = () => {
-    const allEmojis = Object.values(emojiDictionary);
-    const randomEmoji = allEmojis[Math.floor(Math.random() * allEmojis.length)];
-    return randomEmoji;
-  };
-
-  const generateNewLetter = () => {
-    const randomIndex = Math.floor(Math.random() * alphabet.length);
-    const randomLetter = alphabet[randomIndex];
-    const correctEmoji = emojiDictionary[randomLetter];
-
-    const showCorrectEmoji = Math.random() < 0.5;
-    const emojiToShow = showCorrectEmoji ? correctEmoji : getRandomEmoji();
-
-    setCurrentLetter(randomLetter);
-    setCurrentEmoji(emojiToShow);
+  const generateNewFlag = () => {
+    const randomFlag =
+      Object.keys(countryDictionary)[
+        Math.floor(Math.random() * Object.keys(countryDictionary).length)
+      ];
+    setCurrentFlag(randomFlag);
+    setCurrentCountry(countryDictionary[randomFlag]);
     setMessage("");
     setButtonDisabled(false);
+    generateOptions(randomFlag);
   };
 
-  const checkAnswer = (isTrue) => {
+  const generateOptions = (correctFlag) => {
+    const shuffledCountries = countries.sort(() => Math.random() - 0.5);
+    const correctCountry = countryDictionary[correctFlag];
+    const randomOptions = [correctCountry];
+
+    while (randomOptions.length < 4) {
+      const randomCountry =
+        shuffledCountries[Math.floor(Math.random() * shuffledCountries.length)];
+      if (!randomOptions.includes(randomCountry)) {
+        randomOptions.push(randomCountry);
+      }
+    }
+    setOptions(randomOptions.sort(() => Math.random() - 0.5)); // Shuffle options
+  };
+
+  const checkAnswer = (selectedCountry) => {
     if (gameOver || buttonDisabled) return;
 
-    const correctEmoji = emojiDictionary[currentLetter];
-    const isCorrect = currentEmoji === correctEmoji;
-
     setButtonDisabled(true);
-
-    if (isTrue === isCorrect) {
+    if (selectedCountry === countryDictionary[currentFlag]) {
       setMessage("Correct! 🎉");
       setPoints((prevPoints) => prevPoints + 1);
     } else {
       setMessage(
-        `Oops! The correct emoji for ${currentLetter} is ${correctEmoji}.`
+        `Oops! The correct country for ${currentFlag} is ${countryDictionary[currentFlag]}.`
       );
       setLives((prevLives) => prevLives - 1);
     }
@@ -94,7 +85,7 @@ export default function ABC() {
         return newBestScore;
       });
     } else {
-      setTimeout(generateNewLetter, 1000);
+      setTimeout(generateNewFlag, 1000);
     }
   };
 
@@ -103,7 +94,7 @@ export default function ABC() {
     setPoints(0);
     setGameOver(false);
     setConfetti(false); // Reset confetti state
-    generateNewLetter();
+    generateNewFlag();
   };
 
   useEffect(() => {
@@ -111,7 +102,7 @@ export default function ABC() {
     if (storedBestScore) {
       setBestScore(parseInt(storedBestScore, 10));
     }
-    generateNewLetter();
+    generateNewFlag();
   }, []);
 
   return (
@@ -121,7 +112,7 @@ export default function ABC() {
       )}
       <div className="flex items-center flex-col my-2">
         <h1 className="text-3xl font-bold mb-4 text-green-600 text-center">
-          ABC Game
+          Country Flag Match Game
         </h1>
         <button
           onClick={() => setShowModal(true)}
@@ -130,7 +121,7 @@ export default function ABC() {
           How to Play
         </button>
       </div>
-      <div className="flex flex-col items-center justify-center items-center">
+      <div className="flex flex-col items-center justify-center">
         <div className="flex font-bold items-center justify-center gap-3 border-b text-sm sm:text-lg">
           <p className="mb-4">❤️‍🩹 Lives: {lives}</p>
           <p className="mb-4">🔢 Points: {points}</p>
@@ -143,43 +134,27 @@ export default function ABC() {
           className="flex items-center justify-center bg-stone-100 border-2 rounded-lg ring-2 8 w-72 ring-pink-600"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }} // Animation for letter transition
+          exit={{ opacity: 0 }} // Animation for flag transition
           transition={{ duration: 0.5 }} // Transition duration
         >
-          <p className="text-9xl font-bold p-20 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-red-500">
-            {currentLetter}
-          </p>
+          <p className="text-9xl font-bold p-20">{currentFlag}</p>
         </motion.div>
 
         <div className="flex flex-col items-center gap-2">
-          <motion.p
-            className="text-5xl sm:text-6xl"
-            key={currentEmoji} // Animate on emoji change
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0 }}
-            transition={{ duration: 0.5 }} // Transition duration for emoji
-          >
-            {currentEmoji}
-          </motion.p>
           <p className="mt-4 text-lg">{message}</p>
 
           {!gameOver && (
-            <div className="flex space-x-4">
-              <button
-                onClick={() => checkAnswer(true)}
-                className="bg-green-500 border ring-green-600 text-green-50 hover:bg-green-600 py-2 px-4 rounded"
-                disabled={buttonDisabled}
-              >
-                True
-              </button>
-              <button
-                onClick={() => checkAnswer(false)}
-                className="bg-red-500 border ring-red-600 text-red-50 hover:bg-red-600 py-2 px-4 rounded"
-                disabled={buttonDisabled}
-              >
-                False
-              </button>
+            <div className="flex flex-col space-y-4">
+              {options.map((option) => (
+                <button
+                  key={option}
+                  onClick={() => checkAnswer(option)}
+                  className="bg-blue-500 border ring-blue-600 text-white hover:bg-blue-600 py-2 px-4 rounded"
+                  disabled={buttonDisabled}
+                >
+                  {option}
+                </button>
+              ))}
             </div>
           )}
         </div>
@@ -221,9 +196,9 @@ export default function ABC() {
             <div className="bg-white p-8 rounded-lg text-center shadow-lg">
               <h2 className="text-2xl font-bold mb-4">How to Play</h2>
               <p className="mb-4">
-                For each letter, you will see an emoji. Press "True" if the
-                emoji corresponds to the letter or "False" if it doesn't. Try to
-                get the highest score before running out of lives!
+                You will see a country flag. Select the correct country name
+                from the options provided. Try to get the highest score before
+                running out of lives!
               </p>
               <button
                 onClick={() => setShowModal(false)}
