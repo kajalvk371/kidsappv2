@@ -221,9 +221,10 @@ export default function ABC() {
             <div className="bg-white p-8 rounded-lg text-center shadow-lg">
               <h2 className="text-2xl font-bold mb-4">How to Play</h2>
               <p className="mb-4">
-                For each letter, you will see an emoji. Press "True" if the
-                emoji corresponds to the letter or "False" if it doesn't. Try to
-                get the highest score before running out of lives!
+                For each letter, you will see an emoji. Press &&quot;True&quot;
+                if the emoji corresponds to the letter or &quot;False&quot; if
+                it doesn&apos;t. Try to get the highest score before running out
+                of lives!
               </p>
               <button
                 onClick={() => setShowModal(false)}
