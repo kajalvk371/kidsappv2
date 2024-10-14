@@ -8,20 +8,18 @@ export default function Maths() {
   const [num1, setNum1] = useState(0);
   const [num2, setNum2] = useState(0);
   const [operator, setOperator] = useState("+");
-  const [answer, setAnswer] = useState("");
-  const [message, setMessage] = useState(""); // Message to show if the answer is correct or wrong
-  const [showModal, setShowModal] = useState(false);
+  const [answerOptions, setAnswerOptions] = useState([]);
+  const [correctAnswer, setCorrectAnswer] = useState(null);
+  const [message, setMessage] = useState("");
   const [lives, setLives] = useState(3);
   const [gameOver, setGameOver] = useState(false);
-  const [inputError, setInputError] = useState("");
   const [currentScore, setCurrentScore] = useState(0);
   const [bestScore, setBestScore] = useState(0);
-  const [buttonClicked, setButtonClicked] = useState(false);
-  const [changeTries, setChangeTries] = useState(0);
-  const [difficulty, setDifficulty] = useState("easy"); // State for difficulty level
-  const [gameStarted, setGameStarted] = useState(false); // Track if the game has started
+  const [difficulty, setDifficulty] = useState("easy");
+  const [gameStarted, setGameStarted] = useState(false);
+  const [hasSelectedAnswer, setHasSelectedAnswer] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false); // New state for confetti
 
-  // Load best score from local storage on mount
   useEffect(() => {
     const storedBestScore = localStorage.getItem("bestScore");
     if (storedBestScore) {
@@ -29,66 +27,64 @@ export default function Maths() {
     }
   }, []);
 
-  // Save the best score to local storage whenever it updates
   useEffect(() => {
     if (bestScore > 0) {
       localStorage.setItem("bestScore", bestScore);
     }
   }, [bestScore]);
 
-  // Function to generate random math problems
   const generateProblem = () => {
     const operators = ["+", "-", "*", "/"];
     const maxNumber =
-      difficulty === "easy" ? 10 : difficulty === "medium" ? 20 : 50; // Adjust max number based on difficulty
-    setNum1(Math.floor(Math.random() * maxNumber) + 1);
-    setNum2(Math.floor(Math.random() * maxNumber) + 1);
-    setOperator(operators[Math.floor(Math.random() * operators.length)]);
-    setAnswer("");
-    setMessage(""); // Clear the message when generating a new problem
-    setInputError("");
-    setButtonClicked(false);
-  };
+      difficulty === "easy" ? 10 : difficulty === "medium" ? 20 : 50;
 
-  // Function to reset the game
-  const resetGame = () => {
-    setLives(3);
-    setCurrentScore(0);
-    setGameOver(false);
-    setChangeTries(0);
-    generateProblem();
-  };
+    const n1 = Math.floor(Math.random() * maxNumber) + 1;
+    const n2 = Math.floor(Math.random() * maxNumber) + 1;
+    const op = operators[Math.floor(Math.random() * operators.length)];
 
-  // Function to check the answer
-  const checkAnswer = () => {
-    if (isNaN(answer) || answer.trim() === "") {
-      setInputError("Please enter a valid number.");
-      return;
-    } else if (!/^-?\d+(\.\d+)?$/.test(answer)) {
-      setInputError("Please enter a whole or decimal number.");
-      return;
-    }
-
-    let correctAnswer;
-    switch (operator) {
+    let correctAns;
+    switch (op) {
       case "+":
-        correctAnswer = num1 + num2;
+        correctAns = n1 + n2;
         break;
       case "-":
-        correctAnswer = num1 - num2;
+        correctAns = n1 - n2;
         break;
       case "*":
-        correctAnswer = num1 * num2;
+        correctAns = n1 * n2;
         break;
       case "/":
-        correctAnswer = (num1 / num2).toFixed(2);
+        correctAns = parseFloat((n1 / n2).toFixed(2));
         break;
       default:
-        return; // No valid operator
+        return;
     }
 
-    if (parseFloat(answer) === parseFloat(correctAnswer)) {
+    setNum1(n1);
+    setNum2(n2);
+    setOperator(op);
+    setCorrectAnswer(correctAns);
+
+    const incorrectAnswers = Array.from({ length: 3 }, () =>
+      (Math.random() * maxNumber * 2).toFixed(2)
+    );
+
+    const allOptions = [...incorrectAnswers, correctAns].sort(
+      () => 0.5 - Math.random()
+    );
+    setAnswerOptions(allOptions);
+    setMessage("");
+    setHasSelectedAnswer(false);
+  };
+
+  const handleAnswerSelection = (selectedAnswer) => {
+    if (hasSelectedAnswer) return;
+
+    setHasSelectedAnswer(true);
+
+    if (parseFloat(selectedAnswer) === correctAnswer) {
       setMessage("Correct! 🎉");
+      setShowConfetti(true); // Show confetti on correct answer
       setCurrentScore((prevScore) => prevScore + 1);
       if (currentScore + 1 > bestScore) {
         setBestScore(currentScore + 1);
@@ -105,48 +101,32 @@ export default function Maths() {
       });
     }
 
-    setButtonClicked(true);
     setTimeout(() => {
       if (lives > 0) {
+        setShowConfetti(false); // Hide confetti after 2 seconds
         generateProblem();
       }
     }, 2000);
   };
 
-  // Generate a new problem on first load
   useEffect(() => {
     if (gameStarted) {
       generateProblem();
     }
   }, [gameStarted]);
 
-  // Function to change the question
-  const handleChangeQuestion = () => {
-    if (changeTries < 3) {
-      generateProblem();
-      setChangeTries((prevTries) => prevTries + 1);
-    }
-  };
-
-  // Function to start the game
   const startGame = () => {
     setGameStarted(true);
     generateProblem();
   };
 
-  // Function to toggle the How to Play modal
-  const toggleHowToPlay = () => {
-    setShowModal((prev) => !prev);
-  };
-
   return (
     <div className="max-h-screen flex items-center flex-col p-8">
-      {gameOver && <Confetti />}
+      {showConfetti && <Confetti colors={["#ff69b4"]} />} {/* Pink confetti */}
       <h1 className="text-2xl md:text-3xl font-bold mb-4 text-blue-600">
         Maths Game
       </h1>
 
-      {/* Difficulty Selector */}
       {!gameStarted && (
         <div className="mb-4 flex flex-col md:flex-row items-center">
           <label htmlFor="difficulty" className="mr-2">
@@ -168,12 +148,6 @@ export default function Maths() {
           >
             Start Game
           </button>
-          <button
-            onClick={toggleHowToPlay}
-            className="ml-4 bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded"
-          >
-            How to Play
-          </button>
         </div>
       )}
 
@@ -188,78 +162,26 @@ export default function Maths() {
             <p className="text-xl md:text-4xl font-semibold mb-4">
               {num1} {operator} {num2} = ?
             </p>
-            <input
-              type="text"
-              placeholder="Enter the answer of the above question..."
-              className={`border p-2 w-full max-w-xs mb-4 text-center ${
-                inputError ? "border-red-500" : ""
-              }`}
-              value={answer}
-              onChange={(e) => {
-                setAnswer(e.target.value);
-                setInputError(""); // Reset input error on change
-              }}
-            />
-            {inputError && <p className="text-red-500">{inputError}</p>}
+            <div className="grid grid-cols-2 gap-4">
+              {answerOptions.map((option, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleAnswerSelection(option)}
+                  disabled={hasSelectedAnswer}
+                  className={`${
+                    hasSelectedAnswer
+                      ? "bg-gray-400"
+                      : "bg-green-500 hover:bg-green-600"
+                  } text-white py-2 px-4 rounded w-full`}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
 
-            {/* Display the message about correctness */}
             {message && <p className="mt-4 text-lg">{message}</p>}
-
-            <div className="flex flex-row justify-around space-x-0 gap-4 sm:text-lg text-sm">
-              <button
-                onClick={checkAnswer}
-                className={`bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded w-full max-w-[120px] ${
-                  buttonClicked ? "cursor-not-allowed opacity-50" : ""
-                }`}
-                disabled={buttonClicked} // Disable button if clicked
-              >
-                Submit
-              </button>
-              <button
-                onClick={handleChangeQuestion}
-                className={`bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded w-full max-w-[120px] ${
-                  changeTries >= 3 ? "cursor-not-allowed opacity-50" : ""
-                }`}
-                disabled={changeTries >= 3} // Disable if tries are over
-              >
-                Change question(
-                {changeTries < 3 ? 3 - changeTries : "0"} left)
-              </button>
-            </div>
-            <div className="flex font-bold items-center justify-center gap-3 text-sm sm:text-lg">
-              {/* You can add more messages if needed */}
-            </div>
           </div>
         </>
-      )}
-
-      {/* Modal for How to Play */}
-      {showModal && (
-        <motion.div
-          className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center"
-          onClick={toggleHowToPlay}
-        >
-          <motion.div
-            className="bg-white p-8 rounded shadow-lg text-center"
-            onClick={(e) => e.stopPropagation()}
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0 }}
-          >
-            <h2 className="text-2xl font-bold mb-4">How to Play</h2>
-            <p className="mb-4">
-              Solve the math problems to earn points. You have three lives.
-              Answering incorrectly will deduct a life. You can change the
-              question three times during the game.
-            </p>
-            <button
-              onClick={toggleHowToPlay}
-              className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
-            >
-              Close
-            </button>
-          </motion.div>
-        </motion.div>
       )}
     </div>
   );

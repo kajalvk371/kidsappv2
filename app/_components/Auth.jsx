@@ -1,55 +1,91 @@
 "use client";
 import React, { useState } from "react";
-import { useRouter } from "next/navigation"; // Updated import for app router
+import { useRouter } from "next/navigation";
+import { supabase } from "../_lib/supabase"; // Ensure you have the Supabase client setup
+import toast, { Toaster } from "react-hot-toast"; // Import toast and Toaster
+import bcrypt from "bcryptjs"; // Import bcrypt for hashing
 
 export default function Auth() {
-  const [isLogin, setIsLogin] = useState(true); // Toggle between Login and Signup
+  const [isLogin, setIsLogin] = useState(true);
+  const [name, setName] = useState(""); // New state for name field
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
-  const router = useRouter(); // Use this to navigate to other routes
+  const router = useRouter();
 
   // Handle Signup
-  const handleSignup = () => {
-    const users = JSON.parse(localStorage.getItem("users")) || [];
+  const handleSignup = async () => {
+    try {
+      // Hash the password before storing it
+      const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Check if user already exists
-    const existingUser = users.find((user) => user.email === email);
-    if (existingUser) {
-      setMessage("User already exists. Please log in.");
-      return;
+      // Insert the new user into the Supabase 'users' table
+      const { data, error } = await supabase
+        .from("users")
+        .insert([{ name, email, password: hashedPassword }]); // Adding 'name' to the insert query
+
+      if (error) {
+        toast.error(`Error signing up: ${error.message}`); // Show error message
+      } else {
+        toast.success("Signup successful! Please log in."); // Show success message
+        setIsLogin(true); // Switch to login after signup
+      }
+    } catch (err) {
+      toast.error(`An error occurred: ${err.message}`); // Show error message
     }
-
-    // Save new user
-    const newUser = { email, password };
-    localStorage.setItem("users", JSON.stringify([...users, newUser]));
-    setMessage("Signup successful! Please log in.");
-    setIsLogin(true); // Switch to login after signup
   };
 
   // Handle Login
-  const handleLogin = () => {
-    const users = JSON.parse(localStorage.getItem("users")) || [];
+  const handleLogin = async () => {
+    try {
+      // Query Supabase to get the user by email
+      const { data, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("email", email)
+        .single(); // Use single to retrieve a single user
 
-    // Find user
-    const existingUser = users.find(
-      (user) => user.email === email && user.password === password
-    );
-    if (existingUser) {
-      localStorage.setItem("isAuthenticated", "true"); // Set login status (use string)
-      setMessage("Login successful!");
-      router.push("/"); // Redirect to protected route
-    } else {
-      setMessage("Invalid email or password.");
+      if (error) {
+        toast.error(`Error logging in: ${error.message}`); // Show error message
+        return;
+      }
+
+      if (data) {
+        // Verify the password
+        const isPasswordMatch = await bcrypt.compare(password, data.password);
+
+        if (isPasswordMatch) {
+          localStorage.setItem("isAuthenticated", "true");
+          toast.success("Login successful!"); // Show success message
+          router.push("/"); // Redirect to protected route
+        } else {
+          toast.error("Invalid email or password."); // Show error message
+        }
+      } else {
+        toast.error("Invalid email or password."); // Show error message
+      }
+    } catch (err) {
+      toast.error(`An error occurred: ${err.message}`); // Show error message
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+    <div className="min-h-96 flex items-center justify-center">
+      <Toaster position="top-center" /> {/* Add Toaster for notifications */}
       <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-lg">
         <h1 className="text-2xl font-bold mb-6 text-center">
           {isLogin ? "Login" : "Signup"}
         </h1>
+
+        {/* Name Input for Signup */}
+        {!isLogin && (
+          <input
+            type="text"
+            placeholder="Enter your name"
+            className="border p-2 w-full mb-4"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        )}
 
         {/* Email Input */}
         <input
@@ -68,9 +104,6 @@ export default function Auth() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-
-        {/* Form Message */}
-        {message && <p className="text-center mb-4 text-red-500">{message}</p>}
 
         {/* Action Button */}
         {isLogin ? (
