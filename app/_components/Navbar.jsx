@@ -6,15 +6,19 @@ export default function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Check if the user is authenticated based on local storage
-    const authStatus = localStorage.getItem("isAuthenticated");
-    setIsAuthenticated(authStatus === "true");
+    if (typeof window !== "undefined") {
+      // Check if the user is authenticated based on local storage
+      const authStatus = localStorage.getItem("isAuthenticated");
+      setIsAuthenticated(authStatus === "true");
+    }
   }, []);
 
   const handleLogout = () => {
-    // Clear the authentication status from local storage
-    localStorage.setItem("isAuthenticated", "false");
-    setIsAuthenticated(false); // Update state
+    if (typeof window !== "undefined") {
+      // Clear the authentication status from local storage
+      localStorage.setItem("isAuthenticated", "false");
+      setIsAuthenticated(false); // Update state
+    }
   };
 
   return (
