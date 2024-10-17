@@ -150,12 +150,12 @@ export default function QuizGame() {
       <h1 className="text-3xl md:text-4xl font-bold mb-6 text-blue-600 text-center">
         Kids Quiz Game
       </h1>
-      <button
-        onClick={toggleHowToPlay}
-        className="mb-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg"
-      >
-        How to Play
-      </button>
+      <p className="mb-4  max-w-96 bg-blue-100 p-2 rounded-lg text-blue-900">
+        <strong>How to play </strong> : Answer the quiz questions correctly to
+        earn points. You have three lives. Each incorrect answer will deduct one
+        life. You can move to the next question after answering. Scores will be
+        displayed at the end!
+      </p>
       <div className="bg-white rounded-lg border p-6 w-full max-w-3xl flex flex-col items-center space-y-4 shadow-lg">
         {/* Question */}
         <p className="text-lg md:text-2xl mb-4 text-center">
@@ -208,35 +208,6 @@ export default function QuizGame() {
           </button>
         )}
       </div>
-      {/* How to Play Modal */}
-      {showHowToPlay && (
-        <motion.div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
-          onClick={toggleHowToPlay}
-        >
-          <motion.div
-            className="bg-white p-8 rounded shadow-lg text-center"
-            onClick={(e) => e.stopPropagation()}
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0 }}
-          >
-            <h2 className="text-2xl font-bold mb-4 ">How to Play</h2>
-            <p className="mb-4 max-w-96">
-              Answer the quiz questions correctly to earn points. You have three
-              lives. Each incorrect answer will deduct one life. You can move to
-              the next question after answering. Scores will be displayed at the
-              end!
-            </p>
-            <button
-              onClick={toggleHowToPlay}
-              className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg"
-            >
-              Close
-            </button>
-          </motion.div>
-        </motion.div>
-      )}
     </div>
   );
 }

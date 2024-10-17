@@ -126,7 +126,11 @@ export default function Maths() {
       <h1 className="text-2xl md:text-3xl font-bold mb-4 text-blue-600">
         Maths Game
       </h1>
-
+      <p className="mb-4  max-w-96 bg-blue-100 p-2 rounded-lg text-blue-900">
+        <strong> How to play</strong> : You will see a question. Select the
+        correct answer from the options provided. Try to get the highest score
+        before running out of lives!
+      </p>
       {!gameStarted && (
         <div className="mb-4 flex flex-col md:flex-row items-center">
           <label htmlFor="difficulty" className="mr-2">
@@ -150,7 +154,6 @@ export default function Maths() {
           </button>
         </div>
       )}
-
       {gameStarted && (
         <>
           <div className="flex font-bold items-center justify-center gap-3 border-b text-sm sm:text-lg">

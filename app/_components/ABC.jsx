@@ -115,7 +115,7 @@ export default function ABC() {
   }, []);
 
   return (
-    <div className="max-h-screen relative">
+    <div className="min-h-screen relative">
       {confetti && (
         <Confetti width={window.innerWidth} height={window.innerHeight} />
       )}
@@ -123,12 +123,12 @@ export default function ABC() {
         <h1 className="text-3xl font-bold mb-4 text-green-600 text-center">
           ABC Game
         </h1>
-        <button
-          onClick={() => setShowModal(true)}
-          className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded mb-4"
-        >
-          How to Play
-        </button>
+        <p className="mb-4  max-w-96 bg-blue-100 p-2 rounded-lg text-blue-900">
+          <strong> How to play</strong> : For each letter, you will see an
+          emoji. Press &&quot;True&quot; if the emoji corresponds to the letter
+          or &quot;False&quot; if it doesn&apos;t. Try to get the highest score
+          before running out of lives!
+        </p>
       </div>
       <div className="flex flex-col items-center justify-center items-center">
         <div className="flex font-bold items-center justify-center gap-3 border-b text-sm sm:text-lg">
@@ -203,34 +203,6 @@ export default function ABC() {
                 className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded"
               >
                 Retry
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {showModal && (
-          <motion.div
-            className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }} // Animation for modal
-            transition={{ duration: 0.5 }} // Transition duration for modal
-          >
-            <div className="bg-white p-8 rounded-lg text-center shadow-lg">
-              <h2 className="text-2xl font-bold mb-4">How to Play</h2>
-              <p className="mb-4">
-                For each letter, you will see an emoji. Press &&quot;True&quot;
-                if the emoji corresponds to the letter or &quot;False&quot; if
-                it doesn&apos;t. Try to get the highest score before running out
-                of lives!
-              </p>
-              <button
-                onClick={() => setShowModal(false)}
-                className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
-              >
-                Close
               </button>
             </div>
           </motion.div>
